@@ -34,10 +34,6 @@ for path in getRepositoryCatalogResponseList['repositories']:
         getSnapshotsInfoResponse = requests.head(getSnapshotsInfoUrl, auth = credentials, headers={'Accept': 'application/vnd.docker.distribution.manifest.v2+json'})
         if getSnapshotsInfoResponse.status_code != 200:
             raise CommunicationException("Unexpected response status code: %s" % getSnapshotsInfoResponse.status_code)
-        #getSnapshotsInfo = getSnapshotsInfoResponse.json() DELETE
-        #inner_json_v1_compatibility_str = getSnapshotsInfo['history'][0]['v1Compatibility'] DELETE
-        #inner_json_v1_compatibility = json.loads(inner_json_v1_compatibility_str) DELETE
-        #created = inner_json_v1_compatibility['created'] DELETE
         snapshot_last_modified = getSnapshotsInfoResponse.headers['Last-Modified']
         snapshot_last_modified_converted = datetime.strptime(snapshot_last_modified, "%a, %d %b %Y %X %Z").strftime("%Y-%m-%dT%H:%M:%SZ")
         docker_digest_content = getSnapshotsInfoResponse.headers['Docker-Content-Digest']
