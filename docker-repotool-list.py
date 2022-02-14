@@ -5,7 +5,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import sys
 import os
-import json
+from datetime import datetime
 
 class CommunicationException(Exception):
     def __init__(self, message):
@@ -31,12 +31,15 @@ for path in getRepositoryCatalogResponseList['repositories']:
 
     for snapshot_key in getRepositorySnapshotsResponseList['tags']:
         getSnapshotsInfoUrl = '%s/v2/%s/manifests/%s' % (docker_url, path, snapshot_key)
-        getSnapshotsInfoResponse = requests.get(getSnapshotsInfoUrl, auth = credentials)
+        getSnapshotsInfoResponse = requests.head(getSnapshotsInfoUrl, auth = credentials, headers={'Accept': 'application/vnd.docker.distribution.manifest.v2+json'})
         if getSnapshotsInfoResponse.status_code != 200:
             raise CommunicationException("Unexpected response status code: %s" % getSnapshotsInfoResponse.status_code)
-        getSnapshotsInfo = getSnapshotsInfoResponse.json()
-        inner_json_v1_compatibility_str = getSnapshotsInfo['history'][0]['v1Compatibility']
-        inner_json_v1_compatibility = json.loads(inner_json_v1_compatibility_str)
-        created = inner_json_v1_compatibility['created']
-        print("%s/%s %s" % (path, snapshot_key, created))
+        #getSnapshotsInfo = getSnapshotsInfoResponse.json() DELETE
+        #inner_json_v1_compatibility_str = getSnapshotsInfo['history'][0]['v1Compatibility'] DELETE
+        #inner_json_v1_compatibility = json.loads(inner_json_v1_compatibility_str) DELETE
+        #created = inner_json_v1_compatibility['created'] DELETE
+        snapshot_last_modified = getSnapshotsInfoResponse.headers['Last-Modified']
+        snapshot_last_modified_converted = datetime.strptime(snapshot_last_modified, "%a, %d %b %Y %X %Z").strftime("%Y-%m-%dT%H:%M:%SZ")
+        docker_digest_content = getSnapshotsInfoResponse.headers['Docker-Content-Digest']
+        print("%s:%s %s %s" % (path, snapshot_key, snapshot_last_modified_converted, docker_digest_content))
         sys.stdout.flush()
