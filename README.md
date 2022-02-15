@@ -1,6 +1,6 @@
-# Docker Repository List
+# Docker Registry List
 
-*Docker Repository List* is a application used for check last modified date of repository files.
+*Docker Registry Control* is a application used for check last modified date and digest content of repository files.
 
 ## Quick Start
 
@@ -13,8 +13,8 @@ pip install --requirement requirements.txt
 ## Launch
 
 ```shell
-export URL="url"
-export USER="login"
-export PASSWORD="xxxxxxxx"
-./docker-repotool-list.py | tee result.txt
+export DOCKER_REGISTRY_CONTROL_URL="url"
+export DOCKER_REGISTRY_CONTROL_USER="login"
+export DOCKER_REGISTRY_CONTROL_PASSWORD="xxxxxxxx"
+./drctl-list.py | tee result.txt
 ```
